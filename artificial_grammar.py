@@ -28,35 +28,41 @@ import os  # handy system and path functions
 import sys  # to get file system encoding
 
 from psychopy.hardware import keyboard
-from hierarchy import generate_control, generate_local, generate_nested, generate_crossed
+from gui import prompt
+from seqgen import create_sequence
+
+import serial
+import pandas as pd
 
 # Ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-psychopyVersion = '2021.1.4'
-expName = 'artificial_grammar'  # from the Builder filename that created this script
-expInfo = {'participant': '', 'session': '001'}
-dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
-if dlg.OK == False:
-    core.quit()  # user pressed cancel
-expInfo['date'] = data.getDateStr()  # add a simple timestamp
-expInfo['expName'] = expName
-expInfo['psychopyVersion'] = psychopyVersion
+#psychopyVersion = '2021.1.4'
+#expName = 'artificial_grammar'  # from the Builder filename that created this script
+#expInfo = {'participant': '', 'session': '001'}
+#dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
+#if dlg.OK == False:
+#    core.quit()  # user pressed cancel
+#expInfo['date'] = data.getDateStr()  # add a simple timestamp
+#expInfo['expName'] = expName
+#expInfo['psychopyVersion'] = psychopyVersion
 
-# Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expName, expInfo['date'])
-
-# An ExperimentHandler isn't essential but helps with data saving
-thisExp = data.ExperimentHandler(name=expName, version='',
-    extraInfo=expInfo, runtimeInfo=None,
-    originPath='D:\\Code\\artificial-grammar\\artificial_grammar.py',
-    savePickle=True, saveWideText=True,
-    dataFileName=filename)
-# save a log file for detail verbose info
-logFile = logging.LogFile(filename+'.log', level=logging.EXP)
-logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
+response, filename_map = prompt()
+#
+## Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
+#filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expName, expInfo['date'])
+#
+## An ExperimentHandler isn't essential but helps with data saving
+#thisExp = data.ExperimentHandler(name=expName, version='',
+#    extraInfo=expInfo, runtimeInfo=None,
+#    originPath='D:\\Code\\artificial-grammar\\artificial_grammar.py',
+#    savePickle=True, saveWideText=True,
+#    dataFileName=filename)
+## save a log file for detail verbose info
+#logFile = logging.LogFile(filename+'.log', level=logging.EXP)
+#logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
 
 endExpNow = False  # flag for 'escape' or other condition => quit the exp
 frameTolerance = 0.001  # how close to onset before 'same' frame
@@ -64,35 +70,14 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 # Start Code - component code to be run after the window creation
 
 # Setup the Window
-win = visual.Window(
-    size=(1024, 768), fullscr=True, screen=0, 
-    winType='pyglet', allowGUI=False, allowStencil=False,
-    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
-    blendMode='avg', useFBO=True, 
-    units='height')
-# store frame rate of monitor if we can measure it
-expInfo['frameRate'] = win.getActualFrameRate()
-if expInfo['frameRate'] != None:
-    frameDur = 1.0 / round(expInfo['frameRate'])
-else:
-    frameDur = 1.0 / 60.0  # could not measure, so guess
+win = visual.Window(units='height')
 
 # create a default keyboard (e.g. to check for escape)
 defaultKeyboard = keyboard.Keyboard()
 
-if expInfo['participant'] == 'control':
-    title_text = 'TEST\n\nArtificial grammar experiment\n\nNo dependency (control)'
-elif expInfo['participant'] == 'local':
-    title_text = 'TEST\n\nArtificial grammar experiment\n\nLocal dependency'
-elif expInfo['participant'] == 'nested':
-    title_text = 'TEST\n\nArtificial grammar experiment\n\nNested dependencies'
-elif expInfo['participant'] == 'crossed':
-    title_text = 'TEST\n\nArtificial grammar experiment\n\nCrossed dependencies'
-else:
-    title_text = 'TEST\n\nArtificial grammar experiment\n\nNo mode specified'
-
 # Initialize components for Routine "title"
 titleClock = core.Clock()
+title_text = 'Artificial grammar experiment\nParticipant %s\nProtocol %s\nSound Type %s' % (response['Participant'], response['Protocol'], response['Sound Type'])
 textbox = visual.TextBox2(
      win, text=title_text, font='Open Sans',
      pos=(0, 0),     letterHeight=0.05,
@@ -111,17 +96,17 @@ textbox = visual.TextBox2(
 )
 
 # Initialize components for Routine "sound_event"
-sound_eventClock = core.Clock()
-sound_1 = sound.Sound('A', secs=0.1, stereo=True, hamming=True,
-    name='sound_1', sampleRate=44100)
-sound_1.setVolume(1.0)
-test_A = visual.TextStim(win=win, name='test_A',
-    text='100ms A\n\n400ms N/A',
-    font='Open Sans',
-    pos=(0, 0), height=0.1, wrapWidth=None, ori=0.0, 
-    color='black', colorSpace='rgb', opacity=None, 
-    languageStyle='LTR',
-    depth=-1.0);
+#sound_eventClock = core.Clock()
+#sound_1 = sound.Sound('A', secs=0.1, stereo=True, hamming=True,
+#    name='sound_1', sampleRate=44100)
+#sound_1.setVolume(0.5)
+#test_A = visual.TextStim(win=win, name='test_A',
+#    text='TEST',
+#    font='Open Sans',
+#    pos=(0, 0), height=0.1, wrapWidth=None, ori=0.0, 
+#    color='black', colorSpace='rgb', opacity=None, 
+#    languageStyle='LTR',
+#    depth=-1.0);
 
 # Create some handy timers
 globalClock = core.Clock()  # to track the time since experiment started
@@ -193,145 +178,202 @@ while continueRoutine and routineTimer.getTime() > 0:
 for thisComponent in titleComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-thisExp.addData('textbox.text',textbox.text)
 textbox.reset()
-thisExp.addData('textbox.started', textbox.tStartRefresh)
-thisExp.addData('textbox.stopped', textbox.tStopRefresh)
 
-# Generate random ordering of sound events
-if expInfo['participant'] == 'control':
-    sequence = generate_pattern_mismatch(higher_standards, higher_deviant, num_events)
-elif expInfo['participant'] == 'local':
-    sequence = generate_pattern_mismatch(lower_standards, lower_deviant, num_events)
-elif expInfo['participant'] == 'nested':
-elif expInfo['participant'] == 'crossed':
-else:
-    sequence = None
+sequence = create_sequence(
+    response['Protocol'],
+    response['Sound Type'],
+    response['Sounds Folder'],
+    filename_map
+)
+
+sound_text = visual.TextBox2(
+     win, text='PLACEHOLDER', font='Open Sans',
+     pos=(0, 0),     letterHeight=0.05,
+     size=None, borderWidth=2.0,
+     color='black', colorSpace='rgb',
+     opacity=None,
+     bold=False, italic=False,
+     lineSpacing=1.0,
+     padding=None,
+     anchor='center',
+     fillColor=None, borderColor=None,
+     flipHoriz=False, flipVert=False,
+)
+
+if response['Trigger Code']:
+    port = serial.Serial("COM3", baudrate=115200)
+
+log_filename = response['Logs Folder'] 
+log_filename += '/' + data.getDateStr()
+log_filename += '_' + response['Participant']
+log_filename += '_' + str(response['Session Number'])
+log_filename += '.csv'
+
+log_df = pd.DataFrame(columns=[
+    'condition',
+    'stimulus_number',
+    'trial_number',
+    'block_number',
+    'sequence',
+    'stimulus_position_in_trial',
+    'stimulus_id',
+    'stimulus_trigger_code',
+    'sequence_id',
+    'block_id'
+])
+
+for package in sequence:
+    sound_obj = sound.Sound(value=package['file_path'], stereo=True)
+    sound_obj.play(when=win)
+    text = 'Stimulus #%s:\n'
+    text += '    label: %s\n'
+    text += '    position in trial: %s\n'
+    text += '    trigger code: %s\n'
+    text += 'Sequence #%s:\n'
+    text += '    sequence: %s\n'
+    text += '    sequence id: %s\n'
+    text += 'Block #%s:\n'
+    text += '    block id: %s\n'
+    text += 'Condition: %s'
+    text = text % (
+        package['row']['stimulus_number'],
+        package['full_label'],
+        package['row']['stimulus_position_in_trial'],
+        package['row']['stimulus_trigger_code'],
+        package['row']['trial_number'],
+        package['row']['sequence'],
+        package['row']['sequence_id'],
+        package['row']['block_number'],
+        package['row']['block_id'],
+        package['row']['condition']
+    )
+    sound_text.setText(text)
+    sound_text.setAutoDraw(True)
+    if response['Trigger Code']:
+        code = int(package['row']['stimulus_trigger_code'])
+        port.write(code.to_bytes(1, 'big'))
+        port.flush()
+    log_df = log_df.append(package['row'])
+    log_df.to_csv(log_filename)
+    win.flip()
+    while(sound_obj.status != FINISHED):
+        if defaultKeyboard.getKeys(keyList=["escape"]):
+            core.quit()
+    sound_obj.stop()
+    
+sound_text.reset()
 
 # set up handler to look after randomisation of conditions etc
-trials = data.TrialHandler(nReps=1, method='sequential', 
-    extraInfo=expInfo, originPath=-1,
-    trialList=sequence,
-    seed=None, name='trials')
-thisExp.addLoop(trials)  # add the loop to the experiment
-thisTrial = trials.trialList[0]  # so we can initialise stimuli with some values
-# abbreviate parameter names if possible (e.g. rgb = thisTrial.rgb)
-if thisTrial != None:
-    for paramName in thisTrial:
-        exec('{} = thisTrial[paramName]'.format(paramName))
+#trials = data.TrialHandler(nReps=1, method='sequential', originPath=-1,
+#    trialList=sequence,
+#    seed=None, name='trials')
+#thisTrial = trials.trialList[0]  # so we can initialise stimuli with some values
+## abbreviate parameter names if possible (e.g. rgb = thisTrial.rgb)
+#if thisTrial != None:
+#    for paramName in thisTrial:
+#        exec('{} = thisTrial[paramName]'.format(paramName))
 
-trial_count = 0
-for thisTrial in trials:
-    trial_count += 1
-    currentLoop = trials
-    # abbreviate parameter names if possible (e.g. rgb = thisTrial.rgb)
-    if thisTrial != None:
-        for paramName in thisTrial:
-            exec('{} = thisTrial[paramName]'.format(paramName))
-    
-    # ------Prepare to start Routine "sound_event"-------
-    continueRoutine = True
-    routineTimer.add(0.500000)
-    # update component parameters for each repeat
-    if filename is not None:
-        sound_1.setSound(filename, secs=0.1, hamming=True)
-        text = 'event #%d\n\n%s\n\n100ms %s' % (trial_count, label, filename)
-    else:
-        sound_1.setSound(freq, secs=0.1, hamming=True)
-        text = 'event #%d\n\n%s\n\n100ms %ddB %dHz' % (trial_count, label, vol, freq)
-    # source: https://discourse.psychopy.org/t/generating-sound/2325/2
-    # we may need to change this formula depending on output hardware
-    # not even sure if this converts properly tbh
-    volume=((0.34/0.1)/(10**(111.8/20)))*(10**(vol/20))
-    sound_1.setVolume(volume)
-    
-    # update test_A label
-    
-    test_A.setText(text)
-    
-    # keep track of which components have finished
-    sound_eventComponents = [sound_1, test_A]
-    for thisComponent in sound_eventComponents:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    sound_eventClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
-    frameN = -1
-    
-    # -------Run Routine "sound_event"-------
-    while continueRoutine and routineTimer.getTime() > 0:
-        # get current time
-        t = sound_eventClock.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=sound_eventClock)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        # start/stop sound_1
-        if sound_1.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            sound_1.frameNStart = frameN  # exact frame index
-            sound_1.tStart = t  # local t and not account for scr refresh
-            sound_1.tStartRefresh = tThisFlipGlobal  # on global time
-            sound_1.play(when=win)  # sync with win flip
-        if sound_1.status == STARTED:
-            # is it time to stop? (based on global clock, using actual start)
-            if tThisFlipGlobal > sound_1.tStartRefresh + 0.1-frameTolerance:
-                # keep track of stop time/frame for later
-                sound_1.tStop = t  # not accounting for scr refresh
-                sound_1.frameNStop = frameN  # exact frame index
-                win.timeOnFlip(sound_1, 'tStopRefresh')  # time at next scr refresh
-                sound_1.stop()
-        
-        # *test_A* updates
-        if test_A.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            test_A.frameNStart = frameN  # exact frame index
-            test_A.tStart = t  # local t and not account for scr refresh
-            test_A.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(test_A, 'tStartRefresh')  # time at next scr refresh
-            test_A.setAutoDraw(True)
-        if test_A.status == STARTED:
-            # is it time to stop? (based on global clock, using actual start)
-            if tThisFlipGlobal > test_A.tStartRefresh + 0.5-frameTolerance:
-                # keep track of stop time/frame for later
-                test_A.tStop = t  # not accounting for scr refresh
-                test_A.frameNStop = frameN  # exact frame index
-                win.timeOnFlip(test_A, 'tStopRefresh')  # time at next scr refresh
-                test_A.setAutoDraw(False)
-        
-        # check for quit (typically the Esc key)
-        if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
-            core.quit()
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in sound_eventComponents:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # -------Ending Routine "sound_event"-------
-    for thisComponent in sound_eventComponents:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    sound_1.stop()  # ensure sound has stopped at end of routine
-    trials.addData('sound_1.started', sound_1.tStartRefresh)
-    trials.addData('sound_1.stopped', sound_1.tStopRefresh)
-    trials.addData('test_A.started', test_A.tStartRefresh)
-    trials.addData('test_A.stopped', test_A.tStopRefresh)
-    thisExp.nextEntry()
+#trial_count = 0
+#for thisTrial in trials:
+#    trial_count += 1
+#    currentLoop = trials
+#    # abbreviate parameter names if possible (e.g. rgb = thisTrial.rgb)
+#    if thisTrial != None:
+#        for paramName in thisTrial:
+#            exec('{} = thisTrial[paramName]'.format(paramName))
+#    
+#    # ------Prepare to start Routine "sound_event"-------
+#    continueRoutine = True
+#    routineTimer.add(0.500000)
+#    # update component parameters for each repeat
+#    sound_1.setSound(filename, secs=0.1, hamming=True)
+#    text = 'event #%d\n\n%s\n\n%s' % (trial_count, label, filename)
+#    test_A.setText(text)
+#    
+#    # keep track of which components have finished
+#    sound_eventComponents = [sound_1, test_A]
+#    for thisComponent in sound_eventComponents:
+#        thisComponent.tStart = None
+#        thisComponent.tStop = None
+#        thisComponent.tStartRefresh = None
+#        thisComponent.tStopRefresh = None
+#        if hasattr(thisComponent, 'status'):
+#            thisComponent.status = NOT_STARTED
+#    # reset timers
+#    t = 0
+#    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+#    sound_eventClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+#    frameN = -1
+#    
+#    # -------Run Routine "sound_event"-------
+#    while continueRoutine and routineTimer.getTime() > 0:
+#        # get current time
+#        t = sound_eventClock.getTime()
+#        tThisFlip = win.getFutureFlipTime(clock=sound_eventClock)
+#        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+#        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+#        # update/draw components on each frame
+#        # start/stop sound_1
+#        if sound_1.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+#            # keep track of start time/frame for later
+#            sound_1.frameNStart = frameN  # exact frame index
+#            sound_1.tStart = t  # local t and not account for scr refresh
+#            sound_1.tStartRefresh = tThisFlipGlobal  # on global time
+#            sound_1.play(when=win)  # sync with win flip
+#        if sound_1.status == STARTED:
+#            # is it time to stop? (based on global clock, using actual start)
+#            if tThisFlipGlobal > sound_1.tStartRefresh + 0.1-frameTolerance:
+#                # keep track of stop time/frame for later
+#                sound_1.tStop = t  # not accounting for scr refresh
+#                sound_1.frameNStop = frameN  # exact frame index
+#                win.timeOnFlip(sound_1, 'tStopRefresh')  # time at next scr refresh
+#                sound_1.stop()
+#        
+#        # *test_A* updates
+#        if test_A.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+#            # keep track of start time/frame for later
+#            test_A.frameNStart = frameN  # exact frame index
+#            test_A.tStart = t  # local t and not account for scr refresh
+#            test_A.tStartRefresh = tThisFlipGlobal  # on global time
+#            win.timeOnFlip(test_A, 'tStartRefresh')  # time at next scr refresh
+#            test_A.setAutoDraw(True)
+#        if test_A.status == STARTED:
+#            # is it time to stop? (based on global clock, using actual start)
+#            if tThisFlipGlobal > test_A.tStartRefresh + 0.5-frameTolerance:
+#                # keep track of stop time/frame for later
+#                test_A.tStop = t  # not accounting for scr refresh
+#                test_A.frameNStop = frameN  # exact frame index
+#                win.timeOnFlip(test_A, 'tStopRefresh')  # time at next scr refresh
+#                test_A.setAutoDraw(False)
+#        
+#        # check for quit (typically the Esc key)
+#        if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+#            core.quit()
+#        
+#        # check if all components have finished
+#        if not continueRoutine:  # a component has requested a forced-end of Routine
+#            break
+#        continueRoutine = False  # will revert to True if at least one component still running
+#        for thisComponent in sound_eventComponents:
+#            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+#                continueRoutine = True
+#                break  # at least one component has not yet finished
+#        
+#        # refresh the screen
+#        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+#            win.flip()
+#    
+#    # -------Ending Routine "sound_event"-------
+#    for thisComponent in sound_eventComponents:
+#        if hasattr(thisComponent, "setAutoDraw"):
+#            thisComponent.setAutoDraw(False)
+#    sound_1.stop()  # ensure sound has stopped at end of routine
+#    trials.addData('sound_1.started', sound_1.tStartRefresh)
+#    trials.addData('sound_1.stopped', sound_1.tStopRefresh)
+#    trials.addData('test_A.started', test_A.tStartRefresh)
+#    trials.addData('test_A.stopped', test_A.tStopRefresh)
+#    thisExp.nextEntry()
     
 # completed 250.0 repeats of 'trials'
 
@@ -341,10 +383,12 @@ for thisTrial in trials:
 win.flip()
 
 # these shouldn't be strictly necessary (should auto-save)
-thisExp.saveAsWideText(filename+'.csv', delim='auto')
-thisExp.saveAsPickle(filename)
-logging.flush()
-# make sure everything is closed down
-thisExp.abort()  # or data files will save again on exit
+#thisExp.saveAsWideText(filename+'.csv', delim='auto')
+#thisExp.saveAsPickle(filename)
+#logging.flush()
+## make sure everything is closed down
+#thisExp.abort()  # or data files will save again on exit
+if response['Trigger Code']:
+    port.close()
 win.close()
 core.quit()
