@@ -248,7 +248,7 @@ for package in sequence:
         package['row']['block_id'],
         package['row']['condition']
     )
-    sound_text.setText(text)
+    sound_text.setText(text + '\n\n Playing; press \'p\' to pause')
     sound_text.setAutoDraw(True)
     if response['Trigger Code']:
         code = int(package['row']['stimulus_trigger_code'])
@@ -260,6 +260,14 @@ for package in sequence:
     while(sound_obj.status != FINISHED):
         if defaultKeyboard.getKeys(keyList=["escape"]):
             core.quit()
+        if defaultKeyboard.getKeys(keyList=["p"]):
+            sound_text.setText(text + '\n\n Paused; press \'p\' to unpause')
+            win.flip()
+            while(True):
+                if defaultKeyboard.getKeys(keyList=["escape"]):
+                    core.quit()
+                if defaultKeyboard.getKeys(keyList=["p"]):
+                    break
     sound_obj.stop()
     
 sound_text.reset()
